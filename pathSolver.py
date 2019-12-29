@@ -2,6 +2,13 @@
 
 Generate maze to solve
 
+
+
+
+
+
+
+
 """
 
 
@@ -98,24 +105,149 @@ def genCoordinates(table,start_x,start_y,end_x,end_y):
     
 
 def dijikstra(table,coords,start_x,start_y,end_x,end_y):
-    stack = copy.deepcopy(coords)
-    print(stack)
-    print(len(stack))
-    print("=============================")
+    list_of_coordinates = copy.deepcopy(coords)
+    stack = []
+    visited = []
+    stack.append([start_x,start_y])
+    visited.append([start_x,start_y])
 
-    #print(table)
+    while True:
 
-    for coord_pair in stack:
-        table_value = table[coord_pair[1]][coord_pair[0]]
+        holding = []
+        
+        current_visiting_node = visited[-1]
 
-        if table_value == "#":
-            print("removing", coord_pair)
-            stack.remove(coord_pair)
-        # if table[coord_pair[0][coord_pair[1]]] == "#":
-        #     stack.remove(coord_pair)
+        #Check north
+
+        x_val = current_visiting_node[0]
+        y_val = current_visiting_node[1]-1
+
+        print("checking North:")
+        print("Current Visitng node",x_val,",",y_val," " , visited)
+
+        try:
+            if table[y_val][x_val] == ".": 
+                print('North is a valid node')
+                holding.append([x_val,y_val])
+
+        except IndexError:
+            print("North is out of range")
+
+
+         #Check South
+
+        x_val = current_visiting_node[0]
+        y_val = current_visiting_node[1] + 1
+
+        print("checking North:")
+        print("Current Visitng node", x_val, ",", y_val, " ", visited)
+
+        try:
+            if table[y_val][x_val] == ".":
+                print('South is a valid node')
+                holding.append([x_val, y_val])
+
+        except IndexError:
+            print("South is out of range")
+
+
+        #Check East
+
+        x_val = current_visiting_node[0]+1
+        y_val = current_visiting_node[1] 
+
+        print("checking East:")
+        print("Current Visitng node", x_val, ",", y_val, " ", visited)
+
+        try:
+            if table[y_val][x_val] == ".":
+                print('East is a valid node')
+                holding.append([x_val, y_val])
+
+        except IndexError:
+            print("East is out of range")
+
+        #Check WEst
+
+        x_val = current_visiting_node[0] -1
+        y_val = current_visiting_node[1] 
+
+        print("checking North:")
+        print("Current Visitng node", x_val, ",", y_val, " ", visited)
+
+        try:
+            if table[y_val][x_val] == ".":
+                print('West is a valid node')
+                print("symbol at west is",table[y_val][x_val])
+                holding.append([x_val, y_val])
+
+        except IndexError:
+            print("West is out of range")
+        
+        if holding != []:
+            print("We have found the following visitable nodes around",current_visiting_node)
+            print("Visitable nodes",holding)
+
+            print("best node to visit is ", holding[0])
+
+            visited.append([holding[0]])
+
+            
+        
+        else:
+            print("There are no visitable nodes ")
+
+
+'''
+node_dictionary = 
+
+
+{
+
+"5,3": {value:".", distance_from_start: 5 , from: "6,3", distance_to_end = 3.6  }
+
+
+}
+'''
+
+def genNodeMap(table,end_x,end_y):
+
+    node_map = {}
+
+    for i in range(len(table)):
+        for k in range(len(table[i])):
+            end_distance = math.sqrt(((end_x - k)**2 + (end_y - i)**2))
+            node_map[str(k)+','+str(i)] = {"value":str(table[i][k]),"distance_from_start":999, "from":"","distance_to_end": round(end_distance,3)}
     
-    print(stack)
-    print(len(stack))
+    print(node_map)
+
+    return node_map
+
+
+
+
+#TODO Implement algorithm using dictonary
+
+    #print(stack)
+
+
+    # print(len(stack))
+    # print("=============================")
+
+    # #print(table)
+
+    
+    # for coord_pair in stack:
+    #     table_value = table[coord_pair[1]][coord_pair[0]]
+
+    #     if table_value == "#":
+    #         print("removing", coord_pair)
+    #         stack.remove(coord_pair)
+    #     # if table[coord_pair[0][coord_pair[1]]] == "#":
+    #     #     stack.remove(coord_pair)
+    
+    # print(stack)
+    # print(len(stack))
 
 
 
@@ -130,7 +262,8 @@ if __name__ == "__main__":
 
     print_table(obstacle_table)
     coords = genCoordinates(obstacle_table,start_x,start_y,end_x,end_y)
-    dijikstra(obstacle_table,coords,start_x,start_y,end_x,end_y)
+    node_map = genNodeMap(obstacle_table,end_x,end_y)
+    #dijikstra(obstacle_table,coords,start_x,start_y,end_x,end_y)
 
     #print(coords)
 
