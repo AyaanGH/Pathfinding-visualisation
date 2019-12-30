@@ -119,24 +119,25 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y,node_map,size_x,size_y):
         
         current_visiting_node = visited[-1]
 
-        print('cURRENT VISINT NODE: ', current_visiting_node)
+        # print('cURRENT VISINT NODE: ', current_visiting_node)
 
         #Check north
 
         x_val = current_visiting_node[0]
         y_val = current_visiting_node[1]-1
 
-        print("checking North:")
-        print("Current Visitng node",x_val,",",y_val," " , visited)
+        # print("checking North:")
+        # print("Current Visitng node",x_val,",",y_val," " , visited)
 
         try:
             if table[y_val][x_val] == "." or table[y_val][x_val] == "X":
                 if y_val >=0:
-                    print('North is a valid node')
+                    # print('North is a valid node')
                     holding.append([x_val,y_val])
 
         except IndexError:
-            print("North is out of range")
+            pass
+            # print("North is out of range")
 
 
          #Check South
@@ -144,17 +145,18 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y,node_map,size_x,size_y):
         x_val = current_visiting_node[0]
         y_val = current_visiting_node[1] + 1
 
-        print("checking South:")
-        print("Current Visitng node", x_val, ",", y_val, " ", visited)
+        # print("checking South:")
+        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
 
         try:
             if table[y_val][x_val] == "." or table[y_val][x_val] == "X":
                 if y_val <= size_y-1:
-                    print('South is a valid node')
+                    # print('South is a valid node')
                     holding.append([x_val, y_val])
 
         except IndexError:
-            print("South is out of range")
+            pass
+            # print("South is out of range")
 
 
         #Check East
@@ -162,47 +164,49 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y,node_map,size_x,size_y):
         x_val = current_visiting_node[0]+1
         y_val = current_visiting_node[1] 
 
-        print("checking East:")
-        print("Current Visitng node", x_val, ",", y_val, " ", visited)
+        # print("checking East:")
+        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
 
         try:
             if table[y_val][x_val] == "." or table[y_val][x_val] == "X":
                 if x_val<= size_x-1:
-                    print('East is a valid node')
+                    # print('East is a valid node')
                     holding.append([x_val, y_val])
 
         except IndexError:
-            print("East is out of range")
+            # print("East is out of range")
+            pass
 
         #Check WEst
 
         x_val = current_visiting_node[0] -1
         y_val = current_visiting_node[1] 
 
-        print("checking West:")
-        print("Current Visitng node", x_val, ",", y_val, " ", visited)
+        # print("checking West:")
+        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
 
         try:
             if table[y_val][x_val] == "." or table[y_val][x_val] == "X":
                 if x_val >= 0:
-                    print('West is a valid node')
-                    print("symbol at west is",table[y_val][x_val])
+                    # print('West is a valid node')
+                    # print("symbol at west is",table[y_val][x_val])
                     holding.append([x_val, y_val])
 
         except IndexError:
-            print("West is out of range")
+            pass
+            # print("West is out of range")
         
         if holding != []:
-            print("We have found the following visitable nodes around",current_visiting_node)
-            print("Visitable nodes",holding)
+            # print("We have found the following visitable nodes around",current_visiting_node)
+            # print("Visitable nodes",holding)
 
             weight_map = {}
 
             for node in holding:
-                print(node)
+                # print(node)
                 weight_map[str(node)] = node_map[str(node)]['distance_to_end']
 
-                print('weight map')
+                # print('weight map')
                 print(weight_map)
                 
                 #Use dictonary to find ideal weight
@@ -210,14 +214,17 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y,node_map,size_x,size_y):
             minVal = (min(weight_map, key= weight_map.get))
 
             if  weight_map[minVal] == 0.0:
-                print("shortest found")
+                # print("shortest found")
                 del visited[0]
                 return visited
 
 
-            print("best node to visit is ", minVal)
+            # print("best node to visit is ", minVal)
 
             clean_list = json.loads(minVal)
+            clean_list_x = clean_list[0]
+            clean_list_y = clean_list[1]
+            table[clean_list_y][clean_list_x]= '#'
 
             visited.append(clean_list)
 
@@ -225,9 +232,25 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y,node_map,size_x,size_y):
         
         else:
             print("There are no visitable nodes ")
+            print("Fixing")
+            table[y_val][x_val] = "#"
 
-        stack.append
-        cont = input("")
+            del visited[-1]
+            current_visiting_node = visited[-1]
+
+            
+
+            #Check north
+
+            x_val = current_visiting_node[0]
+            y_val = current_visiting_node[1]
+            table[y_val][x_val] = "."
+
+
+
+
+        # stack.append
+        # cont = input("")
 
 
 '''
@@ -251,7 +274,7 @@ def genNodeMap(table,end_x,end_y):
             end_distance = math.sqrt(((end_x - k)**2 + (end_y - i)**2))
             node_map['['+ str(k)+', '+str(i)+']'] = {"value":str(table[i][k]),"distance_from_start":999, "from":"","distance_to_end": round(end_distance,3),"shortest_found":False}
     
-    print(node_map)
+    #print(node_map)
     
     return node_map
 
