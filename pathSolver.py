@@ -130,7 +130,7 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y,node_map,size_x,size_y):
         print("Current Visitng node",x_val,",",y_val," " , visited)
 
         try:
-            if table[y_val][x_val] == ".": 
+            if table[y_val][x_val] == "." or table[y_val][x_val] == "X":
                 if y_val >=0:
                     print('North is a valid node')
                     holding.append([x_val,y_val])
@@ -148,7 +148,7 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y,node_map,size_x,size_y):
         print("Current Visitng node", x_val, ",", y_val, " ", visited)
 
         try:
-            if table[y_val][x_val] == ".":
+            if table[y_val][x_val] == "." or table[y_val][x_val] == "X":
                 if y_val <= size_y-1:
                     print('South is a valid node')
                     holding.append([x_val, y_val])
@@ -166,7 +166,7 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y,node_map,size_x,size_y):
         print("Current Visitng node", x_val, ",", y_val, " ", visited)
 
         try:
-            if table[y_val][x_val] == ".":
+            if table[y_val][x_val] == "." or table[y_val][x_val] == "X":
                 if x_val<= size_x-1:
                     print('East is a valid node')
                     holding.append([x_val, y_val])
@@ -183,7 +183,7 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y,node_map,size_x,size_y):
         print("Current Visitng node", x_val, ",", y_val, " ", visited)
 
         try:
-            if table[y_val][x_val] == ".":
+            if table[y_val][x_val] == "." or table[y_val][x_val] == "X":
                 if x_val >= 0:
                     print('West is a valid node')
                     print("symbol at west is",table[y_val][x_val])
@@ -208,6 +208,13 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y,node_map,size_x,size_y):
                 #Use dictonary to find ideal weight
            
             minVal = (min(weight_map, key= weight_map.get))
+
+            if  weight_map[minVal] == 0.0:
+                print("shortest found")
+                del visited[0]
+                return visited
+
+
             print("best node to visit is ", minVal)
 
             clean_list = json.loads(minVal)
@@ -245,34 +252,22 @@ def genNodeMap(table,end_x,end_y):
             node_map['['+ str(k)+', '+str(i)+']'] = {"value":str(table[i][k]),"distance_from_start":999, "from":"","distance_to_end": round(end_distance,3),"shortest_found":False}
     
     print(node_map)
-
+    
     return node_map
 
 
 
 
-#TODO Implement algorithm using dictonary
+def path_table(visits,obstacle_table):
+    print(visits)
 
-    #print(stack)
+    for node in visits:
+
+        obstacle_table[node[1]][node[0]] = "@"
+        
+    return obstacle_table
 
 
-    # print(len(stack))
-    # print("=============================")
-
-    # #print(table)
-
-    
-    # for coord_pair in stack:
-    #     table_value = table[coord_pair[1]][coord_pair[0]]
-
-    #     if table_value == "#":
-    #         print("removing", coord_pair)
-    #         stack.remove(coord_pair)
-    #     # if table[coord_pair[0][coord_pair[1]]] == "#":
-    #     #     stack.remove(coord_pair)
-    
-    # print(stack)
-    # print(len(stack))
 
 
 
@@ -288,7 +283,36 @@ if __name__ == "__main__":
     print_table(obstacle_table)
     coords = genCoordinates(obstacle_table,start_x,start_y,end_x,end_y)
     node_map = genNodeMap(obstacle_table,end_x,end_y)
-    dijikstra(obstacle_table,coords,start_x,start_y,end_x,end_y,node_map,x,y)
+    visits = dijikstra(obstacle_table,coords,start_x,start_y,end_x,end_y,node_map,x,y)
+
+    print("""
+    
+    
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    """)
+
+    print_table( path_table(visits,obstacle_table))
+
+    print(visits)
 
     #print(coords)
 
