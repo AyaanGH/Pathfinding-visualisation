@@ -104,14 +104,15 @@ def genCoordinates(table,start_x,start_y,end_x,end_y):
 
     
 
-def dijikstra(table,coords,start_x,start_y,end_x,end_y):
-    list_of_coordinates = copy.deepcopy(coords)
-    stack = []
-    visited = []
-    stack.append([start_x,start_y])
-    visited.append([start_x,start_y])
+def dijikstra(table,coords,start_x,start_y,end_x,end_y,node_map,size_x,size_y):
+     list_of_coordinates = copy.deepcopy(coords)
+     stack = []
+     visited = []
+     stack.append([start_x,start_y])
+     visited.append([start_x,start_y])
+     distance_counter = 0
 
-    while True:
+     while True:
 
         holding = []
         
@@ -127,8 +128,9 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y):
 
         try:
             if table[y_val][x_val] == ".": 
-                print('North is a valid node')
-                holding.append([x_val,y_val])
+                if y_val >=0:
+                    print('North is a valid node')
+                    holding.append([x_val,y_val])
 
         except IndexError:
             print("North is out of range")
@@ -139,13 +141,14 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y):
         x_val = current_visiting_node[0]
         y_val = current_visiting_node[1] + 1
 
-        print("checking North:")
+        print("checking South:")
         print("Current Visitng node", x_val, ",", y_val, " ", visited)
 
         try:
             if table[y_val][x_val] == ".":
-                print('South is a valid node')
-                holding.append([x_val, y_val])
+                if y_val <= size_y-1:
+                    print('South is a valid node')
+                    holding.append([x_val, y_val])
 
         except IndexError:
             print("South is out of range")
@@ -161,8 +164,9 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y):
 
         try:
             if table[y_val][x_val] == ".":
-                print('East is a valid node')
-                holding.append([x_val, y_val])
+                if x_val<= size_x-1:
+                    print('East is a valid node')
+                    holding.append([x_val, y_val])
 
         except IndexError:
             print("East is out of range")
@@ -172,14 +176,15 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y):
         x_val = current_visiting_node[0] -1
         y_val = current_visiting_node[1] 
 
-        print("checking North:")
+        print("checking West:")
         print("Current Visitng node", x_val, ",", y_val, " ", visited)
 
         try:
             if table[y_val][x_val] == ".":
-                print('West is a valid node')
-                print("symbol at west is",table[y_val][x_val])
-                holding.append([x_val, y_val])
+                if x_val >= 0:
+                    print('West is a valid node')
+                    print("symbol at west is",table[y_val][x_val])
+                    holding.append([x_val, y_val])
 
         except IndexError:
             print("West is out of range")
@@ -188,7 +193,19 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y):
             print("We have found the following visitable nodes around",current_visiting_node)
             print("Visitable nodes",holding)
 
-            print("best node to visit is ", holding[0])
+            weight_map = {}
+
+            for node in holding:
+                print(node)
+                weight_map[str(node)] = node_map[str(node)]['distance_to_end']
+
+                print('weight map')
+                print(weight_map)
+                
+                #Use dictonary to find ideal weight
+           
+            minVal = (min(weight_map, key= weight_map.get))
+            print("best node to visit is ", minVal)
 
             visited.append([holding[0]])
 
@@ -197,6 +214,9 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y):
         else:
             print("There are no visitable nodes ")
 
+        
+        cont = input("")
+
 
 '''
 node_dictionary = 
@@ -204,7 +224,7 @@ node_dictionary =
 
 {
 
-"5,3": {value:".", distance_from_start: 5 , from: "6,3", distance_to_end = 3.6  }
+"5,3": {value:".", distance_from_start: 5 , from: "6,3", distance_to_end = 3, shortest_found: }
 
 
 }
@@ -217,7 +237,7 @@ def genNodeMap(table,end_x,end_y):
     for i in range(len(table)):
         for k in range(len(table[i])):
             end_distance = math.sqrt(((end_x - k)**2 + (end_y - i)**2))
-            node_map[str(k)+','+str(i)] = {"value":str(table[i][k]),"distance_from_start":999, "from":"","distance_to_end": round(end_distance,3)}
+            node_map['['+ str(k)+', '+str(i)+']'] = {"value":str(table[i][k]),"distance_from_start":999, "from":"","distance_to_end": round(end_distance,3),"shortest_found":False}
     
     print(node_map)
 
@@ -263,7 +283,7 @@ if __name__ == "__main__":
     print_table(obstacle_table)
     coords = genCoordinates(obstacle_table,start_x,start_y,end_x,end_y)
     node_map = genNodeMap(obstacle_table,end_x,end_y)
-    #dijikstra(obstacle_table,coords,start_x,start_y,end_x,end_y)
+    dijikstra(obstacle_table,coords,start_x,start_y,end_x,end_y,node_map,x,y)
 
     #print(coords)
 
