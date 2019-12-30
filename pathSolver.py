@@ -15,6 +15,7 @@ Generate maze to solve
 import random
 import copy
 import math
+import json
 
 def setSize():
     size_x = int(input('X size\n'))
@@ -118,6 +119,8 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y,node_map,size_x,size_y):
         
         current_visiting_node = visited[-1]
 
+        print('cURRENT VISINT NODE: ', current_visiting_node)
+
         #Check north
 
         x_val = current_visiting_node[0]
@@ -207,14 +210,16 @@ def dijikstra(table,coords,start_x,start_y,end_x,end_y,node_map,size_x,size_y):
             minVal = (min(weight_map, key= weight_map.get))
             print("best node to visit is ", minVal)
 
-            visited.append([holding[0]])
+            clean_list = json.loads(minVal)
+
+            visited.append(clean_list)
 
             
         
         else:
             print("There are no visitable nodes ")
 
-        
+        stack.append
         cont = input("")
 
 
