@@ -11,6 +11,8 @@ import random
 import copy
 import math
 import json
+import time
+import os
 
 def setSize():
     size_x = int(input('X size\n'))
@@ -285,12 +287,12 @@ def genNodeMap(table,end_x,end_y):
 
 def foundEnd(coord,end_x,end_y):
 
-    print("Debug, printing Coord",coord)
+   # print("Debug, printing Coord",coord)
     k = coord[-1][0]
     i = coord[-1][1]
     end_distance = math.sqrt(((end_x - k)**2 + (end_y - i)**2))
 
-    print(end_distance)
+    #print("End distance",end_distance)
 
     if end_distance == 1 or end_distance == 1.0:
         return True
@@ -308,17 +310,17 @@ def check_valid_north(table,coordinate,size_x,size_y):
     try:
             if table[y_val][x_val] == "." or table[y_val][x_val] == "X":
                 if y_val >= 0:
-                     print('North is a valid node')
+                    # print('North is a valid node')
 
                      return [x_val, y_val]
 
                 else:
-                    print('North is NOT a valid node')
+                   # print('North is NOT a valid node')
 
                     return False
 
     except IndexError:
-            print("North is out of range")
+           # print("North is out of range")
             return False
 
 
@@ -329,7 +331,7 @@ def check_valid_south(table, coordinate, size_x, size_y):
     try:
             if table[y_val][x_val] == "." or table[y_val][x_val] == "X":
                 if y_val <= size_y-1:
-                     print('South is a valid node')
+                     #print('South is a valid node')
 
                      return [x_val, y_val]
 
@@ -339,7 +341,7 @@ def check_valid_south(table, coordinate, size_x, size_y):
                     return False
 
     except IndexError:
-            print("South is out of range")
+           # print("South is out of range")
             return False
     
 
@@ -350,17 +352,17 @@ def check_valid_east(table, coordinate, size_x, size_y):
     try:
             if table[y_val][x_val] == "." or table[y_val][x_val] == "X":
                 if x_val <= size_x - 1:
-                     print('east is a valid node')
+                     #print('east is a valid node')
 
                      return [x_val, y_val]
 
                 else:
-                    print('east is NOT a valid node')
+                   # print('east is NOT a valid node')
 
                     return False
 
     except IndexError:
-            print("east is out of range")
+            #print("east is out of range")
 
             return False
 
@@ -372,17 +374,17 @@ def check_valid_west(table, coordinate, size_x, size_y):
     try:
             if table[y_val][x_val] == "." or table[y_val][x_val] == "X":
                 if x_val >= 0:
-                     print('west is a valid node')
+                    # print('west is a valid node')
 
                      return [x_val, y_val]
 
                 else:
-                    print('west is NOT a valid node')
+                   # print('west is NOT a valid node')
 
                     return False
 
     except IndexError:
-            print("west is out of range")
+            #print("west is out of range")
             return False
 
 
@@ -405,6 +407,20 @@ def valid(action,table,deque,size_x,size_y):
 
     
     
+def vibrant_table(table):
+    for i in range(len(table)):
+        for k in range(len(table)):
+
+            if table[k][i] == "X":
+                table[k][i] = "⛳"
+
+            # if pretty_table[k][i] == ".":
+            #     pretty_table[k][i] = "☰"
+
+            if table[k][i] == "O":
+                table[k][i] = "⛹"
+
+    return table 
 
 
    
@@ -415,8 +431,14 @@ def valid(action,table,deque,size_x,size_y):
 def bfs(coords,table, start_x,start_y,end_x,end_y,size_x,size_y):
 
     table = copy.deepcopy(table)
+    pretty_table = copy.deepcopy(table)
 
-    print_table(table)
+    pretty_table = vibrant_table(pretty_table)
+        
+
+                
+
+    print_table(pretty_table)
     input("")
     queue = []
     action_list = []
@@ -430,21 +452,24 @@ def bfs(coords,table, start_x,start_y,end_x,end_y,size_x,size_y):
     #last_queue_coord = queue[0][-1]
 
     while foundEnd(dequeued,end_x,end_y) is False:
-        print("Queue: ", queue)
-        print("Distance to end", foundEnd(dequeued, end_x, end_y))
+        #print("Queue: ", queue)
+        #print("Distance to end", foundEnd(dequeued, end_x, end_y))
         dequeued = queue[0]
 
 
         #TODO when on second round, it keeps checking first value of queue
 
-        print("Dequed Sequence: ", dequeued)
+       # print("Dequed Sequence: ", dequeued)
         del queue[0]
-        print("Queue remaining: ", queue)
+        #print("Queue remaining: ", queue)
 
         last_coord_of_dequed = dequeued[-1]
 
         for actions in ["N","S","E","W"]:
-            print_table(table)
+            os.system('cls')
+            print('==============================================')
+            print_table(pretty_table)
+            time.sleep(0.005*2)
 
            # print("in for loop, printing dequed and then 'dequed[-1]' ",dequeued)
            # print(dequeued[-1])
@@ -454,7 +479,7 @@ def bfs(coords,table, start_x,start_y,end_x,end_y,size_x,size_y):
             #TODO check logic of adding new value to dequed or queue
 
             if check_actions is False or check_actions is None:
-                print(actions,"is not viable")
+               # print(actions,"is not viable")
                 continue
 
             dequeued_copy = copy.deepcopy(dequeued)
@@ -464,11 +489,12 @@ def bfs(coords,table, start_x,start_y,end_x,end_y,size_x,size_y):
 
             #TODO problem appears to be here
             queue.append(dequeued_copy)
-            print("The Queue", queue)
+           # print("The Queue", queue)
 
-            print("printing check actions ", check_actions)
+            #print("printing check actions ", check_actions)
 
             table[check_actions[1]][check_actions[0]] = "#"
+            pretty_table[check_actions[1]][check_actions[0]] = "✔"
     
     print("FOUND END")
     print(dequeued)
@@ -493,6 +519,7 @@ def path_table(visits,obstacle_table):
     for node in visits:
 
         obstacle_table[node[1]][node[0]] = "@"
+    obstacle_table = vibrant_table(obstacle_table)
         
     return obstacle_table
 
