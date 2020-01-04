@@ -414,8 +414,12 @@ def vibrant_table(table):
             if table[k][i] == "X":
                 table[k][i] = "⛳"
 
-            # if pretty_table[k][i] == ".":
-            #     pretty_table[k][i] = "☰"
+            if table[k][i] == "#":
+                table[k][i] = "⚪"
+                #table[k][i] = "⛰️"
+
+            if table[k][i] == ".":
+                table[k][i] = "⚫"
 
             if table[k][i] == "O":
                 table[k][i] = "⛹"
@@ -466,10 +470,7 @@ def bfs(coords,table, start_x,start_y,end_x,end_y,size_x,size_y):
         last_coord_of_dequed = dequeued[-1]
 
         for actions in ["N","S","E","W"]:
-            os.system('cls')
-            print('==============================================')
-            print_table(pretty_table)
-            time.sleep(0.005*2)
+           
 
            # print("in for loop, printing dequed and then 'dequed[-1]' ",dequeued)
            # print(dequeued[-1])
@@ -495,6 +496,10 @@ def bfs(coords,table, start_x,start_y,end_x,end_y,size_x,size_y):
 
             table[check_actions[1]][check_actions[0]] = "#"
             pretty_table[check_actions[1]][check_actions[0]] = "✔"
+            os.system('cls')
+            #print('==============================================')
+            #time.sleep(0.001)
+            print_table(pretty_table)
     
     print("FOUND END")
     print(dequeued)
@@ -518,7 +523,7 @@ def path_table(visits,obstacle_table):
 
     for node in visits:
 
-        obstacle_table[node[1]][node[0]] = "@"
+        obstacle_table[node[1]][node[0]] = "✔️"
     obstacle_table = vibrant_table(obstacle_table)
         
     return obstacle_table
