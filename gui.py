@@ -10,14 +10,13 @@ class Cell:
     def  __init__(self,canvas,x,y,size):
         self.canvas = canvas
         self.box = self.canvas.create_rectangle(x,y,x+size,y+size)
+        self.colour = ""
         
     def set_colour(self,colour):
         self.canvas.itemconfigure(self.box,fill=colour)
 
-
-
-
-
+    def get_colour(self):
+        self.canvas.itemcget(self.box,"fill")
 
 
 
@@ -26,8 +25,6 @@ root.resizable(False,False)
 
 w = tk.Canvas(root, width = 500, height = 500)
 
-
-w.grid
 
 height = 500
 
