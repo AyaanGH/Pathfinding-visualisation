@@ -5,6 +5,15 @@ import random
 root = tk.Tk()
 sidebar = tk.Frame(root, width=200, height=500, borderwidth=2)
 
+start_button  = tk.Button(sidebar, text = "Start", width = 200//5)
+stop_button  = tk.Button(sidebar, text = "Stop", width = 200//5)
+clear_button  = tk.Button(sidebar, text = "Clear", width = 200//5)
+
+
+
+start_button.grid(row = 0)
+stop_button.grid(row = 1)
+clear_button.grid(row = 2)
 sidebar.pack(expand=False, fill='both', side='right', anchor='nw')
 class Grid:
 
@@ -93,9 +102,6 @@ class Cell:
                 myGrid.green_set = True
 
 
-
-        print(green_set,red_set)
-
     def on_click(self, event):
         self.dragging = True
         self.on_move(event)
@@ -126,16 +132,11 @@ square_size = 20
 
 
 # Create grid and initialise cell
-
-
-
     
-    
-
 myGrid = Grid(width, height, square_size)
 
-# myGrid.grid[0][10].set_colour('red')
-# myGrid.grid[10][10].set_colour('green')
+
+
 
 myGrid.start()
 
