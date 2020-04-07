@@ -126,13 +126,13 @@ def init_weighted_search():
     # root.after()
     size_y = len(myGrid.grid)
     size_x = len(myGrid.grid[0])
-    holding = []
     visited = []
     visited.append([myGrid.start_cell.x,myGrid.start_cell.y])
     
     def weighted_search():
 
-        print(myGrid.start_cell.x, myGrid.start_cell.y)
+        holding = []
+        # print(myGrid.start_cell.x, myGrid.start_cell.y)
         current_visiting_node = visited[-1]
         # Check north
 
@@ -199,11 +199,11 @@ def init_weighted_search():
 
         except IndexError:
             pass
-            # print("West is out of range")
+            print("West is out of range")
 
         if holding != []:
-            print("We have found the following visitable nodes around",current_visiting_node)
-            print("Visitable nodes",holding)
+            # print("We have found the following visitable nodes around",current_visiting_node)
+            # print("Visitable nodes",holding)
 
             weight_map = {}
 
@@ -233,8 +233,8 @@ def init_weighted_search():
             visited.append(clean_list)
 
         else:
-            print("There are no visitable nodes ")
-            print("Fixing")
+            # print("There are no visitable nodes ")
+            # print("Fixing")
             myGrid.grid[y_val][x_val].set_colour('blue')
 
             if len(visited) > size_x * size_y + 1:
@@ -250,10 +250,9 @@ def init_weighted_search():
             myGrid.grid[y_val][x_val].set_colour('white')
 
 
-        # myGrid.grid[myGrid.start_cell.x][myGrid.start_cell.y] 
 
 
-
+        # print("=========================")
         root.after(100,weighted_search)
     weighted_search()
 
