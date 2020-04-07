@@ -10,10 +10,16 @@ stop_button  = tk.Button(sidebar, text = "Stop", width = 200//5)
 clear_button  = tk.Button(sidebar, text = "Clear", width = 200//5)
 
 
+clicked = tk.StringVar()
+clicked.set("Pathfinding Algorithm")
+drop_down = tk.OptionMenu(sidebar, clicked, "Weighted Search", "Breath First Search")
 
+    
 start_button.grid(row = 0)
 stop_button.grid(row = 1)
 clear_button.grid(row = 2)
+
+drop_down.grid(row=3)
 sidebar.pack(expand=False, fill='both', side='right', anchor='nw')
 class Grid:
 
