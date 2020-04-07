@@ -4,7 +4,6 @@ import json
 import math
 
 
-
 class Grid:
 
     def __init__(self, width, height, square_size):
@@ -24,13 +23,12 @@ class Grid:
 
     def update_cell(self):
 
-        
         for i in range(len(self.grid)):
             for k in range(len(self.grid[i])):
-        
+
                 if self.grid[i][k].get_colour() == "green":
                     self.start_cell = self.grid[i][k]
-                
+
                 elif self.grid[i][k].get_colour() == "red":
                     self.end_cell = self.grid[i][k]
 
@@ -41,11 +39,12 @@ class Cell:
 
     def __init__(self, canvas, x, y, size):
         self.canvas = canvas
-        self.x = int(x /size)
-        self.y = int(y /size)
+        self.x = int(x / size)
+        self.y = int(y / size)
 
         self.viable = True
-        self.box = self.canvas.create_rectangle(x, y, x+size, y+size, fill="white")
+        self.box = self.canvas.create_rectangle(
+            x, y, x+size, y+size, fill="white")
         # self.canvas.tag_bind(self.box,"<Motion><B1-Motion>",lambda x: self.set_colour("pink"))
         # self.colour = ""
         self.dragging = False
@@ -69,7 +68,6 @@ class Cell:
         #     rect_id = items[0]
         #     colour_of_rect = self.canvas.itemcget(rect_id, "fill")
 
-        
         red_set = myGrid.red_set
         green_set = myGrid.green_set
 
@@ -83,13 +81,11 @@ class Cell:
             self.set_colour("white")
             myGrid.green_set = False
 
-
         elif colour_of_rect == "white":
             if green_set == False and red_set == False:
                 self.set_colour("green")
                 myGrid.green_set = True
-        
-        
+
             elif green_set == True and red_set == False:
                 self.set_colour("red")
                 myGrid.red_set = True
@@ -97,9 +93,8 @@ class Cell:
             elif green_set == False and red_set == True:
                 self.set_colour("green")
                 myGrid.green_set = True
-        
-        myGrid.update_cell()
 
+        myGrid.update_cell()
 
     def on_click(self, event):
         self.dragging = True
@@ -110,27 +105,27 @@ class Cell:
             items = self.canvas.find_closest(event.x, event.y)
             if items:
                 rect_id = items[0]
-                
-                self.canvas.itemconfigure(rect_id, fill="pink")
 
+
+                
+                if self.canvas.itemcget(rect_id,"fill") == "red" or self.canvas.itemcget(rect_id,"fill") == "green":
+                    pass
+                else:    
+                    self.canvas.itemconfigure(rect_id, fill="pink")
 
     def on_release(self, event):
         self.dragging = False
 
 
-
 def init_weighted_search():
-
-
-    #Check NESW for cell closest to end
-    # root.after()
     size_y = len(myGrid.grid)
     size_x = len(myGrid.grid[0])
     visited = []
-    visited.append([myGrid.start_cell.x,myGrid.start_cell.y])
-    
+    visited.append([myGrid.start_cell.x, myGrid.start_cell.y])
+
     def weighted_search():
 
+        end_loop = False
         holding = []
         # print(myGrid.start_cell.x, myGrid.start_cell.y)
         current_visiting_node = visited[-1]
@@ -153,7 +148,6 @@ def init_weighted_search():
 
         x_val = current_visiting_node[0]
         y_val = current_visiting_node[1] + 1
-
 
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
@@ -209,19 +203,21 @@ def init_weighted_search():
 
             for node in holding:
                 # print(node)
-                weight_map[str(node)] = math.sqrt(((myGrid.end_cell.x - node[0])**2 + (myGrid.end_cell.y - node[1])**2))
+                weight_map[str(node)] = math.sqrt(
+                    ((myGrid.end_cell.x - node[0])**2 + (myGrid.end_cell.y - node[1])**2))
 
                 # print('weight map')
-                print(weight_map)
+                # print(weight_map)
 
                 # Use dictonary to find ideal weight
 
             minVal = (min(weight_map, key=weight_map.get))
-
+            print(minVal)
             if weight_map[minVal] == 0.0:
                 # print("shortest found")
                 del visited[0]
-                return visited
+                # return visited
+                end_loop = True
 
             # print("best node to visit is ", minVal)
 
@@ -230,6 +226,7 @@ def init_weighted_search():
             clean_list_y = clean_list[1]
             myGrid.grid[clean_list_y][clean_list_x].set_colour('blue')
 
+            print("Appending")
             visited.append(clean_list)
 
         else:
@@ -240,7 +237,10 @@ def init_weighted_search():
             if len(visited) > size_x * size_y + 1:
                 return False
 
+            myGrid.grid[visited[-1][1]][visited[-1][0]].set_colour("gray")
             del visited[-1]
+
+            
             current_visiting_node = visited[-1]
 
             # Check north
@@ -249,31 +249,54 @@ def init_weighted_search():
             y_val = current_visiting_node[1]
             myGrid.grid[y_val][x_val].set_colour('white')
 
-
-
-
         # print("=========================")
-        root.after(100,weighted_search)
+
+        if end_loop == True:
+            print("ENDING")
+            print("Visited")
+            print(visited)
+
+            for node in visited[:-1]:
+                    myGrid.grid[node[1]][node[0]].set_colour("orange")
+                      
+
+
+           
+        
+        else:
+            root.after(10, weighted_search)
+            
     weighted_search()
+
+
+    # print("Visited")
+    # print(visited)
+    # for node in visited:
+    #     myGrid.grid[node[1]][node[0]].set_colour("yellow")
+    #     root.after(100)        
+
+
 
 
 
 root = tk.Tk()
 sidebar = tk.Frame(root, width=200, height=500, borderwidth=2)
 
-start_button  = tk.Button(sidebar, text = "Start", width = 200//5,command = init_weighted_search )
-stop_button  = tk.Button(sidebar, text = "Stop", width = 200//5)
-clear_button  = tk.Button(sidebar, text = "Clear", width = 200//5)
+start_button = tk.Button(sidebar, text="Start",
+                         width=200//5, command=init_weighted_search)
+stop_button = tk.Button(sidebar, text="Stop", width=200//5)
+clear_button = tk.Button(sidebar, text="Clear", width=200//5)
 
 
 clicked = tk.StringVar()
 clicked.set("Pathfinding Algorithm")
-drop_down = tk.OptionMenu(sidebar, clicked, "Weighted Search", "Breath First Search")
+drop_down = tk.OptionMenu(
+    sidebar, clicked, "Weighted Search", "Breath First Search")
 
 
-start_button.grid(row = 0)
-stop_button.grid(row = 1)
-clear_button.grid(row = 2)
+start_button.grid(row=0)
+stop_button.grid(row=1)
+clear_button.grid(row=2)
 
 drop_down.grid(row=3)
 sidebar.pack(expand=False, fill='both', side='right', anchor='nw')
@@ -291,16 +314,13 @@ square_size = 20
 
 
 # Create grid and initialise cell
-    
+
 myGrid = Grid(width, height, square_size)
-
-
 
 
 # myGrid.start()
 
 w.pack()
-
 
 
 root.mainloop()
