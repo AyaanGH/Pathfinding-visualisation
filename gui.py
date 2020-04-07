@@ -32,6 +32,16 @@ class Grid:
                 elif self.grid[i][k].get_colour() == "red":
                     self.end_cell = self.grid[i][k]
 
+    def clear_solve(self):
+        for i in range(len(self.grid)):
+            for k in range(len(self.grid[i])):
+
+                if self.grid[i][k].get_colour() != "green" and self.grid[i][k].get_colour() != "red" and self.grid[i][k].get_colour() != "pink":
+                    self.grid[i][k].set_colour("white")
+        
+        
+
+
 
 class Cell:
 
@@ -224,7 +234,11 @@ def init_weighted_search():
             clean_list = json.loads(minVal)
             clean_list_x = clean_list[0]
             clean_list_y = clean_list[1]
-            myGrid.grid[clean_list_y][clean_list_x].set_colour('blue')
+
+            if end_loop:
+                pass
+            else:
+                myGrid.grid[clean_list_y][clean_list_x].set_colour('blue')
 
             print("Appending")
             visited.append(clean_list)
@@ -232,12 +246,23 @@ def init_weighted_search():
         else:
             # print("There are no visitable nodes ")
             # print("Fixing")
-            myGrid.grid[y_val][x_val].set_colour('blue')
+            if (myGrid.grid[y_val][x_val].get_colour() == "green" or myGrid.grid[y_val][x_val].get_colour() == "pink"):
+                pass
+
+            else:
+                myGrid.grid[y_val][x_val].set_colour('blue')
 
             if len(visited) > size_x * size_y + 1:
                 return False
 
-            myGrid.grid[visited[-1][1]][visited[-1][0]].set_colour("gray")
+
+
+            if (myGrid.grid[visited[-1][1]][visited[-1][0]].get_colour() == "green"):
+                pass
+
+            else:
+                myGrid.grid[visited[-1][1]][visited[-1][0]].set_colour("gray") 
+
             del visited[-1]
 
             
@@ -247,18 +272,22 @@ def init_weighted_search():
 
             x_val = current_visiting_node[0]
             y_val = current_visiting_node[1]
-            myGrid.grid[y_val][x_val].set_colour('white')
+
+            if (myGrid.grid[y_val][x_val].get_colour() == "green"):
+                pass
+
+            else:
+                myGrid.grid[y_val][x_val].set_colour('white')
 
         # print("=========================")
 
         if end_loop == True:
-            print("ENDING")
-            print("Visited")
-            print(visited)
+            
 
             for node in visited[:-1]:
                     myGrid.grid[node[1]][node[0]].set_colour("orange")
                       
+            myGrid.start_cell.set_colour('green')
 
 
            
@@ -276,7 +305,8 @@ def init_weighted_search():
     #     root.after(100)        
 
 
-
+def clear_solve():
+    myGrid.clear_solve()
 
 
 root = tk.Tk()
@@ -285,7 +315,8 @@ sidebar = tk.Frame(root, width=200, height=500, borderwidth=2)
 start_button = tk.Button(sidebar, text="Start",
                          width=200//5, command=init_weighted_search)
 stop_button = tk.Button(sidebar, text="Stop", width=200//5)
-clear_button = tk.Button(sidebar, text="Clear", width=200//5)
+clear_solve_button = tk.Button(sidebar, text="Clear Solve", width=200//5 ,command = clear_solve)
+
 
 
 clicked = tk.StringVar()
@@ -296,7 +327,7 @@ drop_down = tk.OptionMenu(
 
 start_button.grid(row=0)
 stop_button.grid(row=1)
-clear_button.grid(row=2)
+clear_solve_button.grid(row=2)
 
 drop_down.grid(row=3)
 sidebar.pack(expand=False, fill='both', side='right', anchor='nw')
@@ -310,7 +341,7 @@ height = 500
 width = 500
 
 
-square_size = 20
+square_size = 10
 
 
 # Create grid and initialise cell
