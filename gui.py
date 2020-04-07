@@ -10,15 +10,26 @@ sidebar.pack(expand=False,fill='both',side = 'right', anchor = 'nw')
 
 class Cell:
 
+    #Static attributes
+
+    
+
     def  __init__(self,canvas,x,y,size):
         self.canvas = canvas
         self.box = self.canvas.create_rectangle(x,y,x+size,y+size, fill = "white")
         # self.canvas.tag_bind(self.box,"<Motion><B1-Motion>",lambda x: self.set_colour("pink"))
-        self.colour = ""
+        # self.colour = ""
         self.dragging = False
-        self.canvas.bind("<ButtonPress-1>", self.on_click)
-        self.canvas.bind("<B1-Motion>", self.on_move)
-        self.canvas.bind("<ButtonRelease-1>", self.on_release)
+
+        self.canvas.tag_bind(self.box,"<1>", self.left_press)
+
+
+
+
+        #Create obstacles
+        self.canvas.bind("<ButtonPress-3>", self.on_click)
+        self.canvas.bind("<B3-Motion>", self.on_move)
+        self.canvas.bind("<ButtonRelease-3>", self.on_release)
 
         
     def set_colour(self,colour):
@@ -28,6 +39,19 @@ class Cell:
         self.canvas.itemcget(self.box,"fill")
 
     
+
+
+    def left_press(self,event):
+
+        items = self.canvas.find_closest(event.x, event.y)
+        if items:
+                    rect_id = items[0]
+                    colour_of_rect = self.canvas.itemcget(rect_id,"fill")
+
+        if colour_of_rect == "red" or colour_of_rect == "green" or colour_of_rect == "pink":
+            self.set_colour("white")
+
+
     def on_click(self, event):
             self.dragging = True
             self.on_move(event)
