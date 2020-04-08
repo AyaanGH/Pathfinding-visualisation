@@ -38,9 +38,6 @@ class Grid:
 
                 if self.grid[i][k].get_colour() != "green" and self.grid[i][k].get_colour() != "red" and self.grid[i][k].get_colour() != "pink":
                     self.grid[i][k].set_colour("white")
-        
-        
-
 
 
 class Cell:
@@ -115,12 +112,9 @@ class Cell:
             items = self.canvas.find_closest(event.x, event.y)
             if items:
                 rect_id = items[0]
-
-
-                
-                if self.canvas.itemcget(rect_id,"fill") == "red" or self.canvas.itemcget(rect_id,"fill") == "green":
+                if self.canvas.itemcget(rect_id, "fill") == "red" or self.canvas.itemcget(rect_id, "fill") == "green":
                     pass
-                else:    
+                else:
                     self.canvas.itemconfigure(rect_id, fill="pink")
 
     def on_release(self, event):
@@ -147,63 +141,52 @@ def init_weighted_search():
         # print("checking North:")
         # print("Current Visitng node",x_val,",",y_val," " , visited)
 
-        try:
-            if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
-                if y_val >= 0:
-                    print('North is a valid node')
-                    holding.append([x_val, y_val])
-
-        except IndexError:
+        if x_val < 0 or y_val < 0 or x_val > size_x-1 or y_val > size_y-1:
             pass
 
-        x_val = current_visiting_node[0]
-        y_val = current_visiting_node[1] + 1
-
-        try:
+        else:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
-                if y_val <= size_y-1:
-                    # print('South is a valid node')
-                    holding.append([x_val, y_val])
 
-        except IndexError:
-            pass
+                print('North is a valid node')
+                holding.append([x_val, y_val])
+
+            x_val = current_visiting_node[0]
+            y_val = current_visiting_node[1] + 1
+
+            if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
+
+                # print('South is a valid node')
+                holding.append([x_val, y_val])
+
             # print("South is out of range")
-        # Check East
+            # Check East
 
-        x_val = current_visiting_node[0]+1
-        y_val = current_visiting_node[1]
+            x_val = current_visiting_node[0]+1
+            y_val = current_visiting_node[1]
 
-        # print("checking East:")
-        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
+            # print("checking East:")
+            # print("Current Visitng node", x_val, ",", y_val, " ", visited)
 
-        try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
-                if x_val <= size_x-1:
-                    # print('East is a valid node')
-                    holding.append([x_val, y_val])
 
-        except IndexError:
+                # print('East is a vali d node')
+                holding.append([x_val, y_val])
+
             # print("East is out of range")
-            pass
 
-        # Check WEst
+            # Check WEst
 
-        x_val = current_visiting_node[0] - 1
-        y_val = current_visiting_node[1]
+            x_val = current_visiting_node[0] - 1
+            y_val = current_visiting_node[1]
 
-        # print("checking West:")
-        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
+            # print("checking West:")
+            # print("Current Visitng node", x_val, ",", y_val, " ", visited)
 
-        try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
-                if x_val >= 0:
-                    # print('West is a valid node')
-                    # print("symbol at west is",myGrid.grid[y_val][x_val])
-                    holding.append([x_val, y_val])
 
-        except IndexError:
-            pass
-            print("West is out of range")
+                # print('West is a valid node')
+                # print("symbol at west is",myGrid.grid[y_val][x_val])
+                holding.append([x_val, y_val])
 
         if holding != []:
             # print("We have found the following visitable nodes around",current_visiting_node)
@@ -255,18 +238,18 @@ def init_weighted_search():
             if len(visited) > size_x * size_y + 1:
                 return False
 
-
-
             if (myGrid.grid[visited[-1][1]][visited[-1][0]].get_colour() == "green"):
                 pass
 
             else:
-                myGrid.grid[visited[-1][1]][visited[-1][0]].set_colour("gray") 
+                myGrid.grid[visited[-1][1]][visited[-1][0]].set_colour("gray")
 
             del visited[-1]
 
-            
-            current_visiting_node = visited[-1]
+            if len(visited) == 0:
+                end_loop = True
+            else:
+                current_visiting_node = visited[-1]
 
             # Check north
 
@@ -282,27 +265,21 @@ def init_weighted_search():
         # print("=========================")
 
         if end_loop == True:
-            
 
             for node in visited[:-1]:
-                    myGrid.grid[node[1]][node[0]].set_colour("orange")
-                      
+                myGrid.grid[node[1]][node[0]].set_colour("orange")
+
             myGrid.start_cell.set_colour('green')
-
-
-           
-        
         else:
             root.after(10, weighted_search)
-            
-    weighted_search()
 
+    weighted_search()
 
     # print("Visited")
     # print(visited)
     # for node in visited:
     #     myGrid.grid[node[1]][node[0]].set_colour("yellow")
-    #     root.after(100)        
+    #     root.after(100)
 
 
 def clear_solve():
@@ -315,8 +292,8 @@ sidebar = tk.Frame(root, width=200, height=500, borderwidth=2)
 start_button = tk.Button(sidebar, text="Start",
                          width=200//5, command=init_weighted_search)
 stop_button = tk.Button(sidebar, text="Stop", width=200//5)
-clear_solve_button = tk.Button(sidebar, text="Clear Solve", width=200//5 ,command = clear_solve)
-
+clear_solve_button = tk.Button(
+    sidebar, text="Clear Solve", width=200//5, command=clear_solve)
 
 
 clicked = tk.StringVar()
