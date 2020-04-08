@@ -131,6 +131,11 @@ def init_weighted_search():
     def weighted_search():
 
         end_loop = False
+
+        if  myGrid.green_set == False:
+            end_loop = True
+
+
         holding = []
         # print(myGrid.start_cell.x, myGrid.start_cell.y)
         current_visiting_node = visited[-1]
@@ -142,51 +147,82 @@ def init_weighted_search():
         # print("checking North:")
         # print("Current Visitng node",x_val,",",y_val," " , visited)
 
-        if x_val < 0 or y_val < 0 or x_val > size_x-1 or y_val > size_y-1:
+        try:
+            if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
+
+                
+                if y_val <= size_y-1 and y_val >= 0 and x_val>= 0:
+                    # print('South is a valid node')
+                    holding.append([x_val, y_val])
+
+        except IndexError:
+            pass
+            # print("South is out of range")
+        # Check East
+
+        x_val = current_visiting_node[0]+1
+        y_val = current_visiting_node[1]
+
+        # print("checking East:")
+        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
+
+        try:
+            if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
+                if y_val >= 0 and y_val >= 0 and x_val>= 0:
+                    # print('North is a valid node')
+                    holding.append([x_val, y_val])
+
+        except IndexError:
             pass
 
-        else:
+        x_val = current_visiting_node[0]
+        y_val = current_visiting_node[1] + 1
+
+        try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
+                if y_val <= size_y-1 and y_val >= 0 and x_val>= 0:
+                    # print('South is a valid node')
+                    holding.append([x_val, y_val])
 
-                holding.append([x_val, y_val])
-
-            x_val = current_visiting_node[0]
-            y_val = current_visiting_node[1] + 1
-
-            if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
-
-                # print('South is a valid node')
-                holding.append([x_val, y_val])
-
+        except IndexError:
+            pass
             # print("South is out of range")
-            # Check East
+        # Check East
 
-            x_val = current_visiting_node[0]+1
-            y_val = current_visiting_node[1]
+        x_val = current_visiting_node[0]+1
+        y_val = current_visiting_node[1]
 
-            # print("checking East:")
-            # print("Current Visitng node", x_val, ",", y_val, " ", visited)
+        # print("checking East:")
+        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
 
+        try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
+                if x_val <= size_x-1 and y_val >= 0 and x_val>= 0:
+                    # print('East is a valid node')
+                    holding.append([x_val, y_val])
 
-                # print('East is a vali d node')
-                holding.append([x_val, y_val])
-
+        except IndexError:
             # print("East is out of range")
+            pass
 
-            # Check WEst
+        # Check WEst
 
-            x_val = current_visiting_node[0] - 1
-            y_val = current_visiting_node[1]
+        x_val = current_visiting_node[0] - 1
+        y_val = current_visiting_node[1]
 
-            # print("checking West:")
-            # print("Current Visitng node", x_val, ",", y_val, " ", visited)
+        # print("checking West:")
+        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
 
+        try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
+                if x_val >= 0 and y_val >= 0 and x_val>= 0:
+                    # print('West is a valid node')
+                    # print("symbol at west is",myGrid.grid[y_val][x_val])
+                    holding.append([x_val, y_val])
 
-                # print('West is a valid node')
-                # print("symbol at west is",myGrid.grid[y_val][x_val])
-                holding.append([x_val, y_val])
+        except IndexError:
+            pass
+            print("West is out of range")
 
         if holding != []:
             # print("We have found the following visitable nodes around",current_visiting_node)
@@ -303,9 +339,12 @@ def clear_all():
     for i in range(len(myGrid.grid)):
         for k in range(len(myGrid.grid[i])):
             myGrid.grid[i][k].set_colour('white')
+            
+
 
     myGrid.red_set = False
     myGrid.green_set = False
+    
 
 
 
