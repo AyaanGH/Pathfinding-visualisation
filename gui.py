@@ -122,6 +122,7 @@ class Cell:
 
 
 def init_weighted_search():
+    clear_solve()
     size_y = len(myGrid.grid)
     size_x = len(myGrid.grid[0])
     visited = []
@@ -147,7 +148,6 @@ def init_weighted_search():
         else:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
 
-                print('North is a valid node')
                 holding.append([x_val, y_val])
 
             x_val = current_visiting_node[0]
@@ -205,7 +205,7 @@ def init_weighted_search():
                 # Use dictonary to find ideal weight
 
             minVal = (min(weight_map, key=weight_map.get))
-            print(minVal)
+
             if weight_map[minVal] == 0.0:
                 # print("shortest found")
                 del visited[0]
@@ -223,7 +223,6 @@ def init_weighted_search():
             else:
                 myGrid.grid[clean_list_y][clean_list_x].set_colour('blue')
 
-            print("Appending")
             visited.append(clean_list)
 
         else:
@@ -282,18 +281,64 @@ def init_weighted_search():
     #     root.after(100)
 
 
+def init_bfs():
+    pass
+
+
 def clear_solve():
     myGrid.clear_solve()
 
 
+def drop_down_select():
+    if clicked == "Pathfinding Algorithm":
+        clicked.set("Pathfinding Algorithm")
+    elif clicked =="Weighted Search":
+        clicked.set("Weighted Search")
+        
+    
+    elif clicked == "Breath First Search":
+        clicked.set("Breath First Search")
+
+def clear_all():
+    for i in range(len(myGrid.grid)):
+        for k in range(len(myGrid.grid[i])):
+            myGrid.grid[i][k].set_colour('white')
+
+    myGrid.red_set = False
+    myGrid.green_set = False
+
+
+
+def run_alg():
+    func_map = {
+        "Pathfinding Algorithm": None,
+        "Weighted Search": init_weighted_search,
+        "Breath First Search": init_bfs,
+    }
+    # using the map, get the function
+    function = func_map[clicked.get()]
+
+    # call the function
+    function()
+
 root = tk.Tk()
-sidebar = tk.Frame(root, width=200, height=500, borderwidth=2)
+
+
+
+window_width = 700
+window_height = 700
+
+square_size = 20
+
+
+sidebar = tk.Frame(root, width=200, height=window_height, borderwidth=2)
 
 start_button = tk.Button(sidebar, text="Start",
-                         width=200//5, command=init_weighted_search)
-stop_button = tk.Button(sidebar, text="Stop", width=200//5)
+                         width=200//5, command=run_alg)
 clear_solve_button = tk.Button(
     sidebar, text="Clear Solve", width=200//5, command=clear_solve)
+clear_all_button = tk.Button(
+    sidebar, text="Clear All", width=200//5, command=clear_all)
 
 
 clicked = tk.StringVar()
@@ -303,27 +348,20 @@ drop_down = tk.OptionMenu(
 
 
 start_button.grid(row=0)
-stop_button.grid(row=1)
 clear_solve_button.grid(row=2)
+clear_all_button.grid(row=3)
 
-drop_down.grid(row=3)
+drop_down.grid(row=4)
 sidebar.pack(expand=False, fill='both', side='right', anchor='nw')
 
 # root.resizable(False,False)
-w = tk.Canvas(root, width=500, height=500)
+w = tk.Canvas(root, width=window_width, height=window_height)
 
-
-height = 500
-
-width = 500
-
-
-square_size = 10
 
 
 # Create grid and initialise cell
 
-myGrid = Grid(width, height, square_size)
+myGrid = Grid(window_width, window_height, square_size)
 
 
 # myGrid.start()
