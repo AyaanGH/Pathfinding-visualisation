@@ -2,6 +2,7 @@ import tkinter as tk
 import random
 import json
 import math
+import copy
 
 
 class Grid:
@@ -132,9 +133,8 @@ def init_weighted_search():
 
         end_loop = False
 
-        if  myGrid.green_set == False:
+        if myGrid.green_set == False:
             end_loop = True
-
 
         holding = []
         # print(myGrid.start_cell.x, myGrid.start_cell.y)
@@ -150,8 +150,7 @@ def init_weighted_search():
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
 
-                
-                if y_val <= size_y-1 and y_val >= 0 and x_val>= 0:
+                if y_val <= size_y-1 and y_val >= 0 and x_val >= 0:
                     # print('South is a valid node')
                     holding.append([x_val, y_val])
 
@@ -168,7 +167,7 @@ def init_weighted_search():
 
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
-                if y_val >= 0 and y_val >= 0 and x_val>= 0:
+                if y_val >= 0 and y_val >= 0 and x_val >= 0:
                     # print('North is a valid node')
                     holding.append([x_val, y_val])
 
@@ -180,7 +179,7 @@ def init_weighted_search():
 
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
-                if y_val <= size_y-1 and y_val >= 0 and x_val>= 0:
+                if y_val <= size_y-1 and y_val >= 0 and x_val >= 0:
                     # print('South is a valid node')
                     holding.append([x_val, y_val])
 
@@ -197,7 +196,7 @@ def init_weighted_search():
 
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
-                if x_val <= size_x-1 and y_val >= 0 and x_val>= 0:
+                if x_val <= size_x-1 and y_val >= 0 and x_val >= 0:
                     # print('East is a valid node')
                     holding.append([x_val, y_val])
 
@@ -215,7 +214,7 @@ def init_weighted_search():
 
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
-                if x_val >= 0 and y_val >= 0 and x_val>= 0:
+                if x_val >= 0 and y_val >= 0 and x_val >= 0:
                     # print('West is a valid node')
                     # print("symbol at west is",myGrid.grid[y_val][x_val])
                     holding.append([x_val, y_val])
@@ -318,7 +317,152 @@ def init_weighted_search():
 
 
 def init_bfs():
-    pass
+
+    size_y = len(myGrid.grid)
+    size_x = len(myGrid.grid[0])
+
+    queue = []
+    queue.append([[myGrid.start_cell.x, myGrid.start_cell.y]])
+    queue.append([[myGrid.start_cell.x, myGrid.start_cell.y]])
+
+    def bfs():
+        end_loop = False
+        del queue[0]
+        dequeued = queue[0]
+
+
+        
+        current_visiting_node = dequeued[-1]
+        # Check north
+
+        print(current_visiting_node)
+        x_val = dequeued[-1][0]
+        y_val = dequeued[-1][1]-1
+
+        # print("checking North:")
+        # print("Current Visitng node",x_val,",",y_val," " , visited)
+
+        try:
+            if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
+
+                if y_val <= size_y-1 and y_val >= 0 and x_val >= 0:
+                    # print('South is a valid node')
+                    myGrid.grid[y_val][x_val].set_colour("blue")
+
+                    dequeued_copy = copy.deepcopy(dequeued)
+                    dequeued_copy.append([x_val, y_val])
+                    queue.append(dequeued_copy)
+                    # queue.append(dequeued,[x_val, y_val])
+
+        except IndexError:
+            pass
+            # print("South is out of range")
+        # Check East
+
+        x_val = current_visiting_node[0]+1
+        y_val = current_visiting_node[1]
+
+        # print("checking East:")
+        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
+
+        try:
+            if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
+                if y_val >= 0 and y_val >= 0 and x_val >= 0:
+                    # print('North is a valid node')
+                    myGrid.grid[y_val][x_val].set_colour("blue")
+                    # queue.append(dequeued,[x_val, y_val])
+                    dequeued_copy = copy.deepcopy(dequeued)
+                    dequeued_copy.append([x_val, y_val])
+                    queue.append(dequeued_copy)
+
+        except IndexError:
+            pass
+
+        x_val = current_visiting_node[0]
+        y_val = current_visiting_node[1] + 1
+
+        try:
+            if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
+                if y_val <= size_y-1 and y_val >= 0 and x_val >= 0:
+                    # print('South is a valid node')
+                    myGrid.grid[y_val][x_val].set_colour("blue")
+                    # queue.append(dequeued,[x_val, y_val])
+                    dequeued_copy = copy.deepcopy(dequeued)
+                    dequeued_copy.append([x_val, y_val])
+                    queue.append(dequeued_copy)
+
+        except IndexError:
+            pass
+            # print("South is out of range")
+        # Check East
+
+        x_val = current_visiting_node[0]+1
+        y_val = current_visiting_node[1]
+
+        # print("checking East:")
+        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
+
+        try:
+            if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
+                if x_val <= size_x-1 and y_val >= 0 and x_val >= 0:
+                    # print('East is a valid node')
+                    myGrid.grid[y_val][x_val].set_colour("blue")
+                    # queue.append(dequeued,[x_val, y_val])
+                    dequeued_copy = copy.deepcopy(dequeued)
+                    dequeued_copy.append([x_val, y_val])
+                    queue.append(dequeued_copy)
+
+        except IndexError:
+            # print("East is out of range")
+            pass
+
+        # Check WEst
+
+        x_val = current_visiting_node[0] - 1
+        y_val = current_visiting_node[1]
+
+        # print("checking West:")
+        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
+
+        try:
+            if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
+                if x_val >= 0 and y_val >= 0 and x_val >= 0:
+                    # print('West is a valid node')
+                    # print("symbol at west is",myGrid.grid[y_val][x_val])
+                    myGrid.grid[y_val][x_val].set_colour("blue")
+                    # queue.append(dequeued,[x_val, y_val])
+                    dequeued_copy = copy.deepcopy(dequeued)
+                    dequeued_copy.append([x_val, y_val])
+                    queue.append(dequeued_copy)
+
+        except IndexError:
+            pass
+            print("West is out of range")
+
+        coord = dequeued
+
+        k = coord[-1][0]
+        i = coord[-1][1]
+        end_distance = math.sqrt(
+            ((myGrid.end_cell.x - k)**2 + (myGrid.end_cell.y - i)**2))
+
+        #print("End distance",end_distance)
+
+        if end_distance == 1 or end_distance == 1.0:
+            end_loop = True
+
+        if end_loop == True:
+            print(dequeued)
+            for node in dequeued:
+                myGrid.grid[node[1]][node[0]].set_colour("orange")
+
+            myGrid.start_cell.set_colour('green')
+            myGrid.end_cell.set_colour('red')
+            
+
+        else:
+            root.after(30, bfs)
+    bfs()
 
 
 def clear_solve():
@@ -328,24 +472,20 @@ def clear_solve():
 def drop_down_select():
     if clicked == "Pathfinding Algorithm":
         clicked.set("Pathfinding Algorithm")
-    elif clicked =="Weighted Search":
+    elif clicked == "Weighted Search":
         clicked.set("Weighted Search")
-        
-    
+
     elif clicked == "Breath First Search":
         clicked.set("Breath First Search")
+
 
 def clear_all():
     for i in range(len(myGrid.grid)):
         for k in range(len(myGrid.grid[i])):
             myGrid.grid[i][k].set_colour('white')
-            
-
 
     myGrid.red_set = False
     myGrid.green_set = False
-    
-
 
 
 def run_alg():
@@ -360,8 +500,8 @@ def run_alg():
     # call the function
     function()
 
-root = tk.Tk()
 
+root = tk.Tk()
 
 
 window_width = 700
@@ -395,7 +535,6 @@ sidebar.pack(expand=False, fill='both', side='right', anchor='nw')
 
 # root.resizable(False,False)
 w = tk.Canvas(root, width=window_width, height=window_height)
-
 
 
 # Create grid and initialise cell
