@@ -330,8 +330,19 @@ def init_bfs():
         del queue[0]
         dequeued = queue[0]
 
+        frontier_colour = "purple"
 
-        
+       
+        for i in range(len(myGrid.grid)):
+            for k in range(len(myGrid.grid[i])):
+                
+                if myGrid.grid[i][k].get_colour() == frontier_colour:
+                    myGrid.grid[i][k].set_colour("blue")
+
+
+
+        if myGrid.green_set == False:
+            end_loop = True
         current_visiting_node = dequeued[-1]
         # Check north
 
@@ -347,7 +358,7 @@ def init_bfs():
 
                 if y_val <= size_y-1 and y_val >= 0 and x_val >= 0:
                     # print('South is a valid node')
-                    myGrid.grid[y_val][x_val].set_colour("blue")
+                    myGrid.grid[y_val][x_val].set_colour(frontier_colour)
 
                     dequeued_copy = copy.deepcopy(dequeued)
                     dequeued_copy.append([x_val, y_val])
@@ -369,7 +380,7 @@ def init_bfs():
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
                 if y_val >= 0 and y_val >= 0 and x_val >= 0:
                     # print('North is a valid node')
-                    myGrid.grid[y_val][x_val].set_colour("blue")
+                    myGrid.grid[y_val][x_val].set_colour(frontier_colour)
                     # queue.append(dequeued,[x_val, y_val])
                     dequeued_copy = copy.deepcopy(dequeued)
                     dequeued_copy.append([x_val, y_val])
@@ -385,7 +396,7 @@ def init_bfs():
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
                 if y_val <= size_y-1 and y_val >= 0 and x_val >= 0:
                     # print('South is a valid node')
-                    myGrid.grid[y_val][x_val].set_colour("blue")
+                    myGrid.grid[y_val][x_val].set_colour(frontier_colour)
                     # queue.append(dequeued,[x_val, y_val])
                     dequeued_copy = copy.deepcopy(dequeued)
                     dequeued_copy.append([x_val, y_val])
@@ -406,7 +417,7 @@ def init_bfs():
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
                 if x_val <= size_x-1 and y_val >= 0 and x_val >= 0:
                     # print('East is a valid node')
-                    myGrid.grid[y_val][x_val].set_colour("blue")
+                    myGrid.grid[y_val][x_val].set_colour(frontier_colour)
                     # queue.append(dequeued,[x_val, y_val])
                     dequeued_copy = copy.deepcopy(dequeued)
                     dequeued_copy.append([x_val, y_val])
@@ -429,7 +440,7 @@ def init_bfs():
                 if x_val >= 0 and y_val >= 0 and x_val >= 0:
                     # print('West is a valid node')
                     # print("symbol at west is",myGrid.grid[y_val][x_val])
-                    myGrid.grid[y_val][x_val].set_colour("blue")
+                    myGrid.grid[y_val][x_val].set_colour(frontier_colour)
                     # queue.append(dequeued,[x_val, y_val])
                     dequeued_copy = copy.deepcopy(dequeued)
                     dequeued_copy.append([x_val, y_val])
