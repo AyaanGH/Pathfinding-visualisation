@@ -3,6 +3,7 @@ import random
 import json
 import math
 import copy
+import queue
 
 
 class Grid:
@@ -17,7 +18,6 @@ class Grid:
         for y in range(0, height, square_size):
             temp = []
             for x in range(0, width, square_size):
-
                 temp.append(Cell(w, x, y, square_size))
 
             self.grid.append(temp)
@@ -37,7 +37,8 @@ class Grid:
         for i in range(len(self.grid)):
             for k in range(len(self.grid[i])):
 
-                if self.grid[i][k].get_colour() != "green" and self.grid[i][k].get_colour() != "red" and self.grid[i][k].get_colour() != "pink":
+                if self.grid[i][k].get_colour() != "green" and self.grid[i][k].get_colour() != "red" and self.grid[i][
+                    k].get_colour() != "pink":
                     self.grid[i][k].set_colour("white")
 
 
@@ -47,12 +48,15 @@ class Cell:
 
     def __init__(self, canvas, x, y, size):
         self.canvas = canvas
+
         self.x = int(x / size)
         self.y = int(y / size)
 
+        self.neighbours = []
+
         self.viable = True
         self.box = self.canvas.create_rectangle(
-            x, y, x+size, y+size, fill="white")
+            x, y, x + size, y + size, fill="white")
         # self.canvas.tag_bind(self.box,"<Motion><B1-Motion>",lambda x: self.set_colour("pink"))
         # self.colour = ""
         self.dragging = False
@@ -121,6 +125,59 @@ class Cell:
     def on_release(self, event):
         self.dragging = False
 
+    def is_closed(self):
+
+        # todo Add orange colour
+        return self.get_colour() == "orange"
+
+    def is_open(self):
+        # todo Add blue colour
+        return self.get_colour() == "blue"
+
+    def is_barrier(self):
+        return self.get_colour() == "pink"
+
+    def is_start(self):
+        return self.get_colour() == "green"
+
+    def is_end(self):
+        return self.get_colour() == "red"
+
+    def reset(self):
+        self.set_colour("white")
+
+    def make_closed(self):
+
+        # todo Add orange colour
+        self.set_colour("orange")
+
+    def make_open(self):
+        # todo Add blue colour
+        return self.set_colour("blue")
+
+    def update_neighbours(self, Grid):
+        self.neighbours = []
+
+        # Down
+        if self.y < Grid.height - 1 and not Grid.grid[self.x][self.y + 1].is_barrier():
+            self.neighbours.append(Grid.grid[self.x][self.y + 1])
+
+        # Up
+        if self.y > 0 and not Grid.grid[self.x][self.y - 1].is_barrier():
+            self.neighbours.append(Grid.grid[self.x][self.y - 1])
+
+        # Left
+        if self.x > 0 and not Grid.grid[self.x - 1][self.y].is_barrier():
+            self.neighbours.append(Grid.grid[self.x - 1][self.y])
+
+        # right
+        if self.x < Grid.width and not Grid.grid[self.x - 1][self.y].is_barrier():
+            self.neighbours.append(Grid.grid[self.x + 1][self.y])
+
+
+def init_a_star():
+    pass
+
 
 def init_weighted_search():
     clear_solve()
@@ -142,7 +199,7 @@ def init_weighted_search():
         # Check north
 
         x_val = current_visiting_node[0]
-        y_val = current_visiting_node[1]-1
+        y_val = current_visiting_node[1] - 1
 
         # print("checking North:")
         # print("Current Visitng node",x_val,",",y_val," " , visited)
@@ -150,7 +207,7 @@ def init_weighted_search():
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
 
-                if y_val <= size_y-1 and y_val >= 0 and x_val >= 0:
+                if y_val <= size_y - 1 and y_val >= 0 and x_val >= 0:
                     # print('South is a valid node')
                     holding.append([x_val, y_val])
 
@@ -159,7 +216,7 @@ def init_weighted_search():
             # print("South is out of range")
         # Check East
 
-        x_val = current_visiting_node[0]+1
+        x_val = current_visiting_node[0] + 1
         y_val = current_visiting_node[1]
 
         # print("checking East:")
@@ -179,7 +236,7 @@ def init_weighted_search():
 
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
-                if y_val <= size_y-1 and y_val >= 0 and x_val >= 0:
+                if y_val <= size_y - 1 and y_val >= 0 and x_val >= 0:
                     # print('South is a valid node')
                     holding.append([x_val, y_val])
 
@@ -188,7 +245,7 @@ def init_weighted_search():
             # print("South is out of range")
         # Check East
 
-        x_val = current_visiting_node[0]+1
+        x_val = current_visiting_node[0] + 1
         y_val = current_visiting_node[1]
 
         # print("checking East:")
@@ -196,7 +253,7 @@ def init_weighted_search():
 
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
-                if x_val <= size_x-1 and y_val >= 0 and x_val >= 0:
+                if x_val <= size_x - 1 and y_val >= 0 and x_val >= 0:
                     # print('East is a valid node')
                     holding.append([x_val, y_val])
 
@@ -232,7 +289,7 @@ def init_weighted_search():
             for node in holding:
                 # print(node)
                 weight_map[str(node)] = math.sqrt(
-                    ((myGrid.end_cell.x - node[0])**2 + (myGrid.end_cell.y - node[1])**2))
+                    ((myGrid.end_cell.x - node[0]) ** 2 + (myGrid.end_cell.y - node[1]) ** 2))
 
                 # print('weight map')
                 # print(weight_map)
@@ -317,7 +374,6 @@ def init_weighted_search():
 
 
 def init_bfs():
-
     size_y = len(myGrid.grid)
     size_x = len(myGrid.grid[0])
 
@@ -332,14 +388,11 @@ def init_bfs():
 
         frontier_colour = "purple"
 
-       
         for i in range(len(myGrid.grid)):
             for k in range(len(myGrid.grid[i])):
-                
+
                 if myGrid.grid[i][k].get_colour() == frontier_colour:
                     myGrid.grid[i][k].set_colour("blue")
-
-
 
         if myGrid.green_set == False:
             end_loop = True
@@ -348,7 +401,7 @@ def init_bfs():
 
         print(current_visiting_node)
         x_val = dequeued[-1][0]
-        y_val = dequeued[-1][1]-1
+        y_val = dequeued[-1][1] - 1
 
         # print("checking North:")
         # print("Current Visitng node",x_val,",",y_val," " , visited)
@@ -356,7 +409,7 @@ def init_bfs():
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
 
-                if y_val <= size_y-1 and y_val >= 0 and x_val >= 0:
+                if y_val <= size_y - 1 and y_val >= 0 and x_val >= 0:
                     # print('South is a valid node')
                     myGrid.grid[y_val][x_val].set_colour(frontier_colour)
 
@@ -370,7 +423,7 @@ def init_bfs():
             # print("South is out of range")
         # Check East
 
-        x_val = current_visiting_node[0]+1
+        x_val = current_visiting_node[0] + 1
         y_val = current_visiting_node[1]
 
         # print("checking East:")
@@ -394,7 +447,7 @@ def init_bfs():
 
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
-                if y_val <= size_y-1 and y_val >= 0 and x_val >= 0:
+                if y_val <= size_y - 1 and y_val >= 0 and x_val >= 0:
                     # print('South is a valid node')
                     myGrid.grid[y_val][x_val].set_colour(frontier_colour)
                     # queue.append(dequeued,[x_val, y_val])
@@ -407,7 +460,7 @@ def init_bfs():
             # print("South is out of range")
         # Check East
 
-        x_val = current_visiting_node[0]+1
+        x_val = current_visiting_node[0] + 1
         y_val = current_visiting_node[1]
 
         # print("checking East:")
@@ -415,7 +468,7 @@ def init_bfs():
 
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
-                if x_val <= size_x-1 and y_val >= 0 and x_val >= 0:
+                if x_val <= size_x - 1 and y_val >= 0 and x_val >= 0:
                     # print('East is a valid node')
                     myGrid.grid[y_val][x_val].set_colour(frontier_colour)
                     # queue.append(dequeued,[x_val, y_val])
@@ -455,25 +508,33 @@ def init_bfs():
         k = coord[-1][0]
         i = coord[-1][1]
         end_distance = math.sqrt(
-            ((myGrid.end_cell.x - k)**2 + (myGrid.end_cell.y - i)**2))
+            ((myGrid.end_cell.x - k) ** 2 + (myGrid.end_cell.y - i) ** 2))
 
-        #print("End distance",end_distance)
+        # print("End distance",end_distance)
 
         if end_distance == 1 or end_distance == 1.0:
             end_loop = True
 
         if end_loop == True:
-            print(dequeued)
+            # print(dequeued)
             for node in dequeued:
                 myGrid.grid[node[1]][node[0]].set_colour("orange")
 
             myGrid.start_cell.set_colour('green')
             myGrid.end_cell.set_colour('red')
-            
+
 
         else:
             root.after(30, bfs)
+
     bfs()
+
+
+def manhattan_distance(cell1, cell2):
+    x1, y1 = cell1
+    x2, y2 = cell2
+
+    return abs(x1 - x2) + abs(y1 - y2)
 
 
 def clear_solve():
@@ -514,28 +575,24 @@ def run_alg():
 
 root = tk.Tk()
 
-
 window_width = 700
 window_height = 700
 
 square_size = 20
 
-
 sidebar = tk.Frame(root, width=200, height=window_height, borderwidth=2)
 
 start_button = tk.Button(sidebar, text="Start",
-                         width=200//5, command=run_alg)
+                         width=200 // 5, command=run_alg)
 clear_solve_button = tk.Button(
-    sidebar, text="Clear Solve", width=200//5, command=clear_solve)
+    sidebar, text="Clear Solve", width=200 // 5, command=clear_solve)
 clear_all_button = tk.Button(
-    sidebar, text="Clear All", width=200//5, command=clear_all)
-
+    sidebar, text="Clear All", width=200 // 5, command=clear_all)
 
 clicked = tk.StringVar()
 clicked.set("Pathfinding Algorithm")
 drop_down = tk.OptionMenu(
     sidebar, clicked, "Weighted Search", "Breath First Search")
-
 
 start_button.grid(row=0)
 clear_solve_button.grid(row=2)
@@ -547,15 +604,12 @@ sidebar.pack(expand=False, fill='both', side='right', anchor='nw')
 # root.resizable(False,False)
 w = tk.Canvas(root, width=window_width, height=window_height)
 
-
 # Create grid and initialise cell
 
 myGrid = Grid(window_width, window_height, square_size)
 
-
 # myGrid.start()
 
 w.pack()
-
 
 root.mainloop()
