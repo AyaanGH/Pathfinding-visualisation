@@ -12,6 +12,8 @@ class Grid:
         self.grid = []
         self.start_cell = None
         self.end_cell = None
+        self.width = width
+        self.height = height
 
         self.red_set = False
         self.green_set = False
@@ -40,6 +42,21 @@ class Grid:
                 if self.grid[i][k].get_colour() != "green" and self.grid[i][k].get_colour() != "red" and self.grid[i][
                     k].get_colour() != "pink":
                     self.grid[i][k].set_colour("white")
+
+    def get_start(self):
+        for i in range(len(self.grid)):
+            for k in range(len(self.grid[i])):
+
+                if self.grid[i][k].get_colour() == "green":
+                    return self.grid[i][k]
+
+    def get_end(self):
+        for i in range(len(self.grid)):
+            for k in range(len(self.grid[i])):
+
+                if self.grid[i][k].get_colour() == "red":
+                    return self.grid[i][k]
+
 
 
 class Cell:
@@ -171,12 +188,72 @@ class Cell:
             self.neighbours.append(Grid.grid[self.x - 1][self.y])
 
         # right
-        if self.x < Grid.width and not Grid.grid[self.x - 1][self.y].is_barrier():
+        if self.x < Grid.width -1 and not Grid.grid[self.x + 1][self.y].is_barrier():
             self.neighbours.append(Grid.grid[self.x + 1][self.y])
 
 
 def init_a_star():
-    pass
+
+    Grid = myGrid
+    # for y in Grid.grid:
+    #     for x in Grid.grid[y]:
+    #         for cell in Grid.grid[]:
+    #         cell.update_neighbours(Grid)
+
+    for i in range(len(Grid.grid)):
+        for k in range(len(Grid.grid[i])):
+            Grid.grid[i][k].update_neighbours(Grid)
+
+    count = 0
+
+    open_set = queue.PriorityQueue()
+    start = Grid.get_start()
+    end = Grid.get_end()
+    open_set.put((0, count, start()))
+    parent_node = {}
+    end_cell_pos = (end.x, end.y)
+
+    local_score = {Cell: float("inf") for y in Grid.grid for x in Grid.grid}
+    local_score[start] = 0
+    final_score = {Cell: float("inf") for y in Grid.grid for x in Grid.grid}
+    final_score[start] = manhattan_distance((start.x,start.y), end_cell_pos)
+
+
+
+    #Set of nodes to evaluate
+    open_set_hash = {start}
+
+    while not open_set.empty():
+
+        current = open_set.get()[2]
+        open_set_hash.remove(current)
+
+        if current == end:
+            pass #TODO make path
+
+
+        for neighbour in current.neighbours:
+            neighbour_local_score = local_score[current] + 1
+
+            if neighbour_local_score < local_score[neighbour]:
+                parent_node[neighbour] = current
+                local_score[neighbour] = neighbour_local_score
+                final_score[neighbour] = neighbour_local_score + manhattan_distance((neighbour.x,neighbour.y), end_cell_pos)
+
+                if neighbour not in open_set_hash:
+                    count +=1
+                    open_set.put(final_score[neighbour],count,neighbour)
+                    neighbour.make_open()
+
+            if current != start:
+                current.make_closed()
+
+
+
+
+
+
+
 
 
 def init_weighted_search():
@@ -565,11 +642,14 @@ def run_alg():
         "Pathfinding Algorithm": None,
         "Weighted Search": init_weighted_search,
         "Breath First Search": init_bfs,
+        "A* Search": init_a_star
     }
     # using the map, get the function
     function = func_map[clicked.get()]
 
     # call the function
+
+
     function()
 
 
@@ -592,7 +672,7 @@ clear_all_button = tk.Button(
 clicked = tk.StringVar()
 clicked.set("Pathfinding Algorithm")
 drop_down = tk.OptionMenu(
-    sidebar, clicked, "Weighted Search", "Breath First Search")
+    sidebar, clicked, "Weighted Search", "Breath First Search", "A* Search")
 
 start_button.grid(row=0)
 clear_solve_button.grid(row=2)
