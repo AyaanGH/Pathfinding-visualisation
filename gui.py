@@ -1,9 +1,8 @@
-import tkinter as tk
-import random
+import copy
 import json
 import math
-import copy
 import queue
+import tkinter as tk
 
 
 class Grid:
@@ -73,8 +72,7 @@ class Cell:
         self.viable = True
         self.box = self.canvas.create_rectangle(
             x, y, x + size, y + size, fill="white")
-        # self.canvas.tag_bind(self.box,"<Motion><B1-Motion>",lambda x: self.set_colour("pink"))
-        # self.colour = ""
+
         self.dragging = False
 
         self.canvas.tag_bind(self.box, "<1>", self.left_press)
@@ -90,11 +88,6 @@ class Cell:
         return self.canvas.itemcget(self.box, "fill")
 
     def left_press(self, event):
-
-        # items = self.canvas.find_closest(event.x, event.y)
-        # if items:
-        #     rect_id = items[0]
-        #     colour_of_rect = self.canvas.itemcget(rect_id, "fill")
 
         red_set = myGrid.red_set
         green_set = myGrid.green_set
@@ -143,11 +136,10 @@ class Cell:
 
     def is_closed(self):
 
-        # todo Add orange colour
         return self.get_colour() == "orange"
 
     def is_open(self):
-        # todo Add blue colour
+
         return self.get_colour() == "blue"
 
     def is_barrier(self):
@@ -164,13 +156,11 @@ class Cell:
 
     def make_closed(self):
 
-        # todo Add orange colour
         self.set_colour("blue")
 
     def make_open(self):
-        #
+
         self.set_colour("blue")
-        # self.canvas.itemconfigure(self.box, fill="blue")
 
     def make_path(self):
         self.set_colour("orange")
@@ -198,8 +188,7 @@ class Cell:
         False
 
 
-def back_track(parent_node, end_cell,start_cell):
-
+def back_track(parent_node, end_cell, start_cell):
     current = end_cell
     while current in parent_node:
         current = parent_node[current]
@@ -208,12 +197,9 @@ def back_track(parent_node, end_cell,start_cell):
     end_cell.set_colour("red")
     start_cell.set_colour("green")
 
+
 def init_a_star():
     Grid = myGrid
-    # for y in Grid.grid:
-    #     for x in Grid.grid[y]:
-    #         for cell in Grid.grid[]:
-    #         cell.update_neighbours(Grid)
 
     for i in range(len(Grid.grid)):
         for k in range(len(Grid.grid[i])):
@@ -236,45 +222,39 @@ def init_a_star():
     # Set of nodes to evaluate
     open_set_hash = {start}
 
-
     global AFTER
 
     def a_star():
-            count = 0
+        count = 0
 
+        current = open_set.get()[2]
+        open_set_hash.remove(current)
 
-            current = open_set.get()[2]
-            open_set_hash.remove(current)
+        if current == end:
+            back_track(parent_node, end, start)
+            # print("ending")
+            root.after_cancel(AFTER)
 
-            if current == end:
-                back_track(parent_node, end,start)
-                print("ending")
-                root.after_cancel(AFTER)
+        for neighbour in current.neighbours:
+            neighbour_local_score = local_score[current] + 1
 
+            if neighbour_local_score < local_score[neighbour]:
+                parent_node[neighbour] = current
+                local_score[neighbour] = neighbour_local_score
+                final_score[neighbour] = neighbour_local_score + manhattan_distance((neighbour.x, neighbour.y),
+                                                                                    end_cell_pos)
 
-            for neighbour in current.neighbours:
-                neighbour_local_score = local_score[current] + 1
+                if neighbour not in open_set_hash:
+                    count += 1
+                    open_set.put((final_score[neighbour], count, neighbour))
+                    open_set_hash.add(neighbour)
+                    neighbour.make_open()
 
-                if neighbour_local_score < local_score[neighbour]:
-                    parent_node[neighbour] = current
-                    local_score[neighbour] = neighbour_local_score
-                    final_score[neighbour] = neighbour_local_score + manhattan_distance((neighbour.x, neighbour.y),
-                                                                                        end_cell_pos)
+            if current != start:
+                current.make_closed()
 
-                    if neighbour not in open_set_hash:
-                        count += 1
-                        open_set.put((final_score[neighbour], count, neighbour))
-                        open_set_hash.add(neighbour)
-                        neighbour.make_open()
-
-                if current != start:
-                    current.make_closed()
-
-
-
-
-            else:
-                AFTER = root.after(30,a_star)
+        else:
+            AFTER = root.after(30, a_star)
 
     a_star()
 
@@ -290,19 +270,15 @@ def init_weighted_search():
 
         end_loop = False
 
-        if myGrid.green_set == False:
+        if not myGrid.green_set:
             end_loop = True
 
         holding = []
-        # print(myGrid.start_cell.x, myGrid.start_cell.y)
         current_visiting_node = visited[-1]
         # Check north
 
         x_val = current_visiting_node[0]
         y_val = current_visiting_node[1] - 1
-
-        # print("checking North:")
-        # print("Current Visitng node",x_val,",",y_val," " , visited)
 
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
@@ -313,14 +289,11 @@ def init_weighted_search():
 
         except IndexError:
             pass
-            # print("South is out of range")
+
         # Check East
 
         x_val = current_visiting_node[0] + 1
         y_val = current_visiting_node[1]
-
-        # print("checking East:")
-        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
 
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
@@ -342,14 +315,11 @@ def init_weighted_search():
 
         except IndexError:
             pass
-            # print("South is out of range")
+
         # Check East
 
         x_val = current_visiting_node[0] + 1
         y_val = current_visiting_node[1]
-
-        # print("checking East:")
-        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
 
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
@@ -358,7 +328,7 @@ def init_weighted_search():
                     holding.append([x_val, y_val])
 
         except IndexError:
-            # print("East is out of range")
+
             pass
 
         # Check WEst
@@ -366,40 +336,25 @@ def init_weighted_search():
         x_val = current_visiting_node[0] - 1
         y_val = current_visiting_node[1]
 
-        # print("checking West:")
-        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
-
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
                 if x_val >= 0 and y_val >= 0 and x_val >= 0:
-                    # print('West is a valid node')
-                    # print("symbol at west is",myGrid.grid[y_val][x_val])
                     holding.append([x_val, y_val])
 
         except IndexError:
             pass
-            print("West is out of range")
 
         if holding != []:
-            # print("We have found the following visitable nodes around",current_visiting_node)
-            # print("Visitable nodes",holding)
 
             weight_map = {}
 
             for node in holding:
-                # print(node)
                 weight_map[str(node)] = math.sqrt(
                     ((myGrid.end_cell.x - node[0]) ** 2 + (myGrid.end_cell.y - node[1]) ** 2))
-
-                # print('weight map')
-                # print(weight_map)
-
-                # Use dictonary to find ideal weight
 
             minVal = (min(weight_map, key=weight_map.get))
 
             if weight_map[minVal] == 0.0:
-                # print("shortest found")
                 del visited[0]
                 # return visited
                 end_loop = True
@@ -418,9 +373,8 @@ def init_weighted_search():
             visited.append(clean_list)
 
         else:
-            # print("There are no visitable nodes ")
-            # print("Fixing")
-            if (myGrid.grid[y_val][x_val].get_colour() == "green" or myGrid.grid[y_val][x_val].get_colour() == "pink"):
+
+            if myGrid.grid[y_val][x_val].get_colour() == "green" or myGrid.grid[y_val][x_val].get_colour() == "pink":
                 pass
 
             else:
@@ -466,12 +420,6 @@ def init_weighted_search():
 
     weighted_search()
 
-    # print("Visited")
-    # print(visited)
-    # for node in visited:
-    #     myGrid.grid[node[1]][node[0]].set_colour("yellow")
-    #     root.after(100)
-
 
 def init_bfs():
     size_y = len(myGrid.grid)
@@ -499,35 +447,27 @@ def init_bfs():
         current_visiting_node = dequeued[-1]
         # Check north
 
-        print(current_visiting_node)
         x_val = dequeued[-1][0]
         y_val = dequeued[-1][1] - 1
-
-        # print("checking North:")
-        # print("Current Visitng node",x_val,",",y_val," " , visited)
 
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
 
                 if y_val <= size_y - 1 and y_val >= 0 and x_val >= 0:
-                    # print('South is a valid node')
                     myGrid.grid[y_val][x_val].set_colour(frontier_colour)
 
                     dequeued_copy = copy.deepcopy(dequeued)
                     dequeued_copy.append([x_val, y_val])
                     queue.append(dequeued_copy)
-                    # queue.append(dequeued,[x_val, y_val])
+
 
         except IndexError:
             pass
-            # print("South is out of range")
+
         # Check East
 
         x_val = current_visiting_node[0] + 1
         y_val = current_visiting_node[1]
-
-        # print("checking East:")
-        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
 
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
@@ -548,23 +488,17 @@ def init_bfs():
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
                 if y_val <= size_y - 1 and y_val >= 0 and x_val >= 0:
-                    # print('South is a valid node')
                     myGrid.grid[y_val][x_val].set_colour(frontier_colour)
-                    # queue.append(dequeued,[x_val, y_val])
+
                     dequeued_copy = copy.deepcopy(dequeued)
                     dequeued_copy.append([x_val, y_val])
                     queue.append(dequeued_copy)
 
         except IndexError:
             pass
-            # print("South is out of range")
-        # Check East
 
         x_val = current_visiting_node[0] + 1
         y_val = current_visiting_node[1]
-
-        # print("checking East:")
-        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
 
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
@@ -577,24 +511,17 @@ def init_bfs():
                     queue.append(dequeued_copy)
 
         except IndexError:
-            # print("East is out of range")
-            pass
 
-        # Check WEst
+            pass
 
         x_val = current_visiting_node[0] - 1
         y_val = current_visiting_node[1]
 
-        # print("checking West:")
-        # print("Current Visitng node", x_val, ",", y_val, " ", visited)
-
         try:
             if myGrid.grid[y_val][x_val].get_colour() == "white" or myGrid.grid[y_val][x_val].get_colour() == "red":
                 if x_val >= 0 and y_val >= 0 and x_val >= 0:
-                    # print('West is a valid node')
-                    # print("symbol at west is",myGrid.grid[y_val][x_val])
                     myGrid.grid[y_val][x_val].set_colour(frontier_colour)
-                    # queue.append(dequeued,[x_val, y_val])
+
                     dequeued_copy = copy.deepcopy(dequeued)
                     dequeued_copy.append([x_val, y_val])
                     queue.append(dequeued_copy)
@@ -610,13 +537,11 @@ def init_bfs():
         end_distance = math.sqrt(
             ((myGrid.end_cell.x - k) ** 2 + (myGrid.end_cell.y - i) ** 2))
 
-        # print("End distance",end_distance)
-
         if end_distance == 1 or end_distance == 1.0:
             end_loop = True
 
-        if end_loop == True:
-            # print(dequeued)
+        if end_loop:
+
             for node in dequeued:
                 myGrid.grid[node[1]][node[0]].set_colour("orange")
 
@@ -625,7 +550,7 @@ def init_bfs():
 
 
         else:
-            root.after(30, bfs)
+            root.after(5, bfs)
 
     bfs()
 
@@ -667,10 +592,8 @@ def run_alg():
         "Breath First Search": init_bfs,
         "A* Search": init_a_star
     }
-    # using the map, get the function
-    function = func_map[clicked.get()]
 
-    # call the function
+    function = func_map[clicked.get()]
 
     function()
 
@@ -680,7 +603,7 @@ root = tk.Tk()
 window_width = 700
 window_height = 700
 
-square_size = 20
+square_size = 15
 
 sidebar = tk.Frame(root, width=200, height=window_height, borderwidth=2)
 
@@ -703,14 +626,9 @@ clear_all_button.grid(row=3)
 drop_down.grid(row=4)
 sidebar.pack(expand=False, fill='both', side='right', anchor='nw')
 
-# root.resizable(False,False)
 w = tk.Canvas(root, width=window_width, height=window_height)
 
-# Create grid and initialise cell
-
 myGrid = Grid(window_width, window_height, square_size)
-
-# myGrid.start()
 
 w.pack()
 
