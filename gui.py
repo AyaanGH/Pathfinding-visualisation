@@ -169,7 +169,7 @@ class Cell:
 
     def make_open(self):
         #
-        self.set_colour("cyan")
+        self.set_colour("blue")
         # self.canvas.itemconfigure(self.box, fill="blue")
 
     def make_path(self):
@@ -193,6 +193,9 @@ class Cell:
         # right
         if self.x < Grid.width - 1 and not Grid.grid[self.y][self.x + 1].is_barrier():
             self.neighbours.append(Grid.grid[self.y][self.x + 1])
+
+    def __lt__(self, other):
+        False
 
 
 def back_track(parent_node, end_cell,start_cell):
@@ -233,33 +236,47 @@ def init_a_star():
     # Set of nodes to evaluate
     open_set_hash = {start}
 
-    while not open_set.empty():
 
-        # time.sleep(0.1)
-        current = open_set.get()[2]
-        open_set_hash.remove(current)
+    global AFTER
 
-        if current == end:
-            back_track(parent_node, end,start)
-            break
+    def a_star():
+            count = 0
 
-        for neighbour in current.neighbours:
-            neighbour_local_score = local_score[current] + 1
 
-            if neighbour_local_score < local_score[neighbour]:
-                parent_node[neighbour] = current
-                local_score[neighbour] = neighbour_local_score
-                final_score[neighbour] = neighbour_local_score + manhattan_distance((neighbour.x, neighbour.y),
-                                                                                    end_cell_pos)
+            current = open_set.get()[2]
+            open_set_hash.remove(current)
 
-                if neighbour not in open_set_hash:
-                    count += 1
-                    open_set.put((final_score[neighbour], count, neighbour))
-                    open_set_hash.add(neighbour)
-                    neighbour.make_open()
+            if current == end:
+                back_track(parent_node, end,start)
+                print("ending")
+                root.after_cancel(AFTER)
 
-            if current != start:
-                current.make_closed()
+
+            for neighbour in current.neighbours:
+                neighbour_local_score = local_score[current] + 1
+
+                if neighbour_local_score < local_score[neighbour]:
+                    parent_node[neighbour] = current
+                    local_score[neighbour] = neighbour_local_score
+                    final_score[neighbour] = neighbour_local_score + manhattan_distance((neighbour.x, neighbour.y),
+                                                                                        end_cell_pos)
+
+                    if neighbour not in open_set_hash:
+                        count += 1
+                        open_set.put((final_score[neighbour], count, neighbour))
+                        open_set_hash.add(neighbour)
+                        neighbour.make_open()
+
+                if current != start:
+                    current.make_closed()
+
+
+
+
+            else:
+                AFTER = root.after(30,a_star)
+
+    a_star()
 
 
 def init_weighted_search():
