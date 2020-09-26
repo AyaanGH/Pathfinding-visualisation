@@ -12,8 +12,8 @@ class Grid:
         self.grid = []
         self.start_cell = None
         self.end_cell = None
-        self.width = width
-        self.height = height
+        self.width = width // square_size
+        self.height = height // square_size
 
         self.red_set = False
         self.green_set = False
@@ -56,7 +56,6 @@ class Grid:
 
                 if self.grid[i][k].get_colour() == "red":
                     return self.grid[i][k]
-
 
 
 class Cell:
@@ -166,34 +165,47 @@ class Cell:
     def make_closed(self):
 
         # todo Add orange colour
-        self.set_colour("orange")
+        self.set_colour("blue")
 
     def make_open(self):
-        # todo Add blue colour
-        return self.set_colour("blue")
+        #
+        self.set_colour("cyan")
+        # self.canvas.itemconfigure(self.box, fill="blue")
+
+    def make_path(self):
+        self.set_colour("orange")
 
     def update_neighbours(self, Grid):
         self.neighbours = []
 
         # Down
-        if self.y < Grid.height - 1 and not Grid.grid[self.x][self.y + 1].is_barrier():
-            self.neighbours.append(Grid.grid[self.x][self.y + 1])
+        if self.y < Grid.height - 1 and not Grid.grid[self.y + 1][self.x].is_barrier():
+            self.neighbours.append(Grid.grid[self.y + 1][self.x])
 
         # Up
-        if self.y > 0 and not Grid.grid[self.x][self.y - 1].is_barrier():
-            self.neighbours.append(Grid.grid[self.x][self.y - 1])
+        if self.y > 0 and not Grid.grid[self.y - 1][self.x].is_barrier():
+            self.neighbours.append(Grid.grid[self.y - 1][self.x])
 
         # Left
-        if self.x > 0 and not Grid.grid[self.x - 1][self.y].is_barrier():
-            self.neighbours.append(Grid.grid[self.x - 1][self.y])
+        if self.x > 0 and not Grid.grid[self.y][self.x - 1].is_barrier():
+            self.neighbours.append(Grid.grid[self.y][self.x - 1])
 
         # right
-        if self.x < Grid.width -1 and not Grid.grid[self.x + 1][self.y].is_barrier():
-            self.neighbours.append(Grid.grid[self.x + 1][self.y])
+        if self.x < Grid.width - 1 and not Grid.grid[self.y][self.x + 1].is_barrier():
+            self.neighbours.append(Grid.grid[self.y][self.x + 1])
 
+
+def back_track(parent_node, end_cell,start_cell):
+
+    current = end_cell
+    while current in parent_node:
+        current = parent_node[current]
+        current.make_path()
+
+    end_cell.set_colour("red")
+    start_cell.set_colour("green")
 
 def init_a_star():
-
     Grid = myGrid
     # for y in Grid.grid:
     #     for x in Grid.grid[y]:
@@ -209,28 +221,27 @@ def init_a_star():
     open_set = queue.PriorityQueue()
     start = Grid.get_start()
     end = Grid.get_end()
-    open_set.put((0, count, start()))
+    open_set.put((0, count, start))
     parent_node = {}
     end_cell_pos = (end.x, end.y)
 
-    local_score = {Cell: float("inf") for y in Grid.grid for x in Grid.grid}
+    local_score = {cell: float("inf") for y in Grid.grid for cell in y}
     local_score[start] = 0
-    final_score = {Cell: float("inf") for y in Grid.grid for x in Grid.grid}
-    final_score[start] = manhattan_distance((start.x,start.y), end_cell_pos)
+    final_score = {cell: float("inf") for y in Grid.grid for cell in y}
+    final_score[start] = manhattan_distance((start.x, start.y), end_cell_pos)
 
-
-
-    #Set of nodes to evaluate
+    # Set of nodes to evaluate
     open_set_hash = {start}
 
     while not open_set.empty():
 
+        # time.sleep(0.1)
         current = open_set.get()[2]
         open_set_hash.remove(current)
 
         if current == end:
-            pass #TODO make path
-
+            back_track(parent_node, end,start)
+            break
 
         for neighbour in current.neighbours:
             neighbour_local_score = local_score[current] + 1
@@ -238,22 +249,17 @@ def init_a_star():
             if neighbour_local_score < local_score[neighbour]:
                 parent_node[neighbour] = current
                 local_score[neighbour] = neighbour_local_score
-                final_score[neighbour] = neighbour_local_score + manhattan_distance((neighbour.x,neighbour.y), end_cell_pos)
+                final_score[neighbour] = neighbour_local_score + manhattan_distance((neighbour.x, neighbour.y),
+                                                                                    end_cell_pos)
 
                 if neighbour not in open_set_hash:
-                    count +=1
-                    open_set.put(final_score[neighbour],count,neighbour)
+                    count += 1
+                    open_set.put((final_score[neighbour], count, neighbour))
+                    open_set_hash.add(neighbour)
                     neighbour.make_open()
 
             if current != start:
                 current.make_closed()
-
-
-
-
-
-
-
 
 
 def init_weighted_search():
@@ -648,7 +654,6 @@ def run_alg():
     function = func_map[clicked.get()]
 
     # call the function
-
 
     function()
 
